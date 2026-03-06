@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabellone Torneo</title>
+
+<style>
+body {
+  margin:0;
+  background:#0b1f17;
+  font-family: Arial, sans-serif;
+}
+
+.wrapper {
+  width:100vw;
+  height:100vh;
+  overflow:auto;
+}
+
+.tabellone {
+  position:relative;
+  width:2000px;
+  height:1600px;
+  background:#ffffff;
+}
+
+/* PARTITA */
+.partita {
+  position:absolute;
+  width:260px;
+  height:90px;
+  display:flex;
+  padding:10px;
+  border:2px solid #333;
+  border-radius:8px;
+  background:#f5f5f5;
+  box-sizing:border-box;
+  align-items:center; /* ALLINEAMENTO PERFETTO */
+}
+
+/* NOMI */
+.nomi {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-around; /* ALLINEA CON I SET */
+  height:100%;
+  font-size:15px;
+  font-weight:bold;
+}
+
+/* SET */
+.sets {
+  display:flex;
+  flex-direction:column;
+  justify-content:space-around;
+  height:100%;
+  gap:2px;
+}
+
+.sets div {
+  display:flex;
+  gap:6px;
+}
+
+.sets span {
+  width:22px;
+  text-align:center;
+  font-weight:bold;
+  font-size:14px;
+}
+
+/* LINEE Z */
+.lineaZ {
+  position:absolute;
+}
+
+/* VINCITORE */
+.vincitore {
+  position:absolute;
+  padding:4px 12px;
+  border:2px solid green;
+  background:#d0ffd0;
+  font-weight:bold;
+  border-radius:4px;
+}
+
+/* FOTO */
+.foto {
+  position:absolute;
+  background-size:cover;
+  background-position:center;
+  border:2px solid #555;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <div class="tabellone" id="tabellone"></div>
+</div>
+
+<script>
+const tabellone = document.getElementById('tabellone');
+
+/* FUNZIONE SICURA PER LEGGERE I SET */
+function valoreSet(p, riga, colonna) {
+  if (!p.sets) return "";
+  if (!Array.isArray(p.sets)) return "";
+  if (!p.sets[riga]) return "";
+  if (p.sets[riga][colonna] === undefined || p.sets[riga][colonna] === null) return "";
+  return p.sets[riga][colonna];
+}
+
+fetch('tabellone.json?v=' + Date.now())
+  .then(res => res.json())
+  .then(storico => {
+
+    if(!Array.isArray(storico) || storico.length === 0){
+      alert("Nessun tabellone trovato");
+      return;
+    }
+
+    const s = storico[storico.length - 1];
+
+    /* RETTANGOLI */
+    s.posizioni.forEach(p => {
+
+      const div = document.createElement('div');
+      div.className = 'partita';
+      div.style.left = p.left + 'px';
+      div.style.top = p.top + 'px';
+
+      div.innerHTML = `
+        <div class="nomi">
+          <div>${p.giocatoreA ?? ""}</div>
+          <div>${p.giocatoreB ?? ""}</div>
+        </div>
+        <div class="sets">
+          <div>
+            <span>${valoreSet(p,0,0)}</span>
+            <span>${valoreSet(p,0,1)}</span>
+            <span>${valoreSet(p,0,2)}</span>
+          </div>
+          <div>
+            <span>${valoreSet(p,1,0)}</span>
+            <span>${valoreSet(p,1,1)}</span>
+            <span>${valoreSet(p,1,2)}</span>
+          </div>
+        </div>
+      `;
+
+      tabellone.appendChild(div);
+    });
+
+    /* LINEE Z */
+    if(s.lineeZ){
+      s.lineeZ.forEach(z => {
+
+        const div = document.createElement('div');
+        div.className = 'lineaZ';
+        div.style.left = z.left + 'px';
+        div.style.top = z.top + 'px';
+
+        const v = Math.abs(z.vert);
+
+        if(z.vert >= 0){
+          div.innerHTML = `
+            <div style="position:absolute;width:${z.oriz1}px;height:2px;background:black;"></div>
+            <div style="position:absolute;left:${z.oriz1-2}px;width:2px;height:${v}px;background:black;"></div>
+            <div style="position:absolute;left:${z.oriz1-2}px;top:${v-2}px;width:${z.oriz2}px;height:2px;background:black;"></div>
+          `;
+        } else {
+          div.innerHTML = `
+            <div style="position:absolute;bottom:0;width:${z.oriz1}px;height:2px;background:black;"></div>
+            <div style="position:absolute;left:${z.oriz1-2}px;bottom:0;width:2px;height:${v}px;background:black;"></div>
+            <div style="position:absolute;left:${z.oriz1-2}px;bottom:${v-2}px;width:${z.oriz2}px;height:2px;background:black;"></div>
+          `;
+        }
+
+        tabellone.appendChild(div);
+      });
+    }
+
+    /* VINCITORI */
+    if(s.vincitori){
+      s.vincitori.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'vincitore';
+        div.textContent = v.nome ?? "";
+        div.style.left = v.left + 'px';
+        div.style.top = v.top + 'px';
+        tabellone.appendChild(div);
+      });
+    }
+
+    /* FOTO */
+    if(s.foto){
+      s.foto.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'foto';
+        div.style.left = f.left + 'px';
+        div.style.top = f.top + 'px';
+        div.style.width = f.width + 'px';
+        div.style.height = f.height + 'px';
+        div.style.backgroundImage = `url(${f.src})`;
+        tabellone.appendChild(div);
+      });
+    }
+
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Errore caricamento tabellone.json");
+  });
+</script>
+
+</body>
+</html>
