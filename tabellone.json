@@ -1,53 +1,30 @@
+
 [
   {
-    "data": "12/03/2026, 08:21:15",
-    "numRettangoli": 3,
+    "data": "12/03/2026, 15:28:12",
+    "numRettangoli": 1,
     "posizioni": [
       {
-        "left": 268,
-        "top": 224.667,
-        "giocatoreA": "giacomo",
-        "giocatoreB": "venuti",
+        "left": 374.667,
+        "top": 138.667,
+        "giocatoreA": "",
+        "giocatoreB": "",
         "sets": [
           [
-            "6",
-            "6",
-            "6"
+            "",
+            "",
+            ""
           ],
           [
-            "2",
-            "2",
-            "2"
+            "",
+            "",
+            ""
           ]
         ]
-      },
-      {
-        "left": 267.333,
-        "top": 89.3333,
-        "giocatoreA": "roberto .b",
-        "giocatoreB": "massimo .a",
-        "sets": [
-          [
-            "6",
-            "6",
-            "6"
-          ],
-          [
-            "3",
-            "3",
-            "3"
-          ]
-        ]
-      },
-      {
-        "left": 717.333,
-        "top": 158.667,
-        "giocatoreA": "roberto",
-        "giocatoreB": "giacomo",
-        "sets": [
-          [
-            "6",
-            "6",
-            "3"
-          ],
-          [
+      }
+    ],
+    "lineeZ": [],
+    "vincitori": [],
+    "foto": []
+  }
+]
